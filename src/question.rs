@@ -1,6 +1,7 @@
 use std::io::{self, Write}; 
 
 
+//Enum to identify the expected answer type from a question. 
 pub enum QuestionType{
     Bool,
     Int,
@@ -9,6 +10,7 @@ pub enum QuestionType{
     Text,
 }
 
+//Enum to identify the type the answer should be
 pub enum AnswerType{
     Bool(bool),
     Int(i32),
