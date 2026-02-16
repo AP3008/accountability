@@ -44,14 +44,20 @@ pub fn ask_question(question: &str, question_type: QuestionType) -> Result<Answe
            QuestionType::Int => {
                match input.parse::<i32>(){ // We want to specify i32
                     Ok(num) => return Ok(AnswerType::Int(num)),
-                    Err(e) => continue
+                    Err(_e) => continue
                } 
            },
            QuestionType::Float => {
-
+               match input.parse::<f64>(){
+                    Ok(num) => return Ok(AnswerType::Float(num)),
+                    Err(_e) => continue
+               } 
            },
            QuestionType::PosNumber => {
-
+               match input.parse::<u32>(){
+                    Ok(num) => return Ok(AnswerType::PosNumber(num)),
+                    Err(_e) => continue
+               }
            }, 
            QuestionType::Text => {
                 // Just need to make sure it is not empty.
@@ -62,7 +68,14 @@ pub fn ask_question(question: &str, question_type: QuestionType) -> Result<Answe
                 return Ok(AnswerType::Text(input.to_string())); 
            }, 
            QuestionType::Bool => {
-
+                match input.to_lowercase().as_str() {
+                "y" | "yes" | "true" | "1" | "t" => return Ok(AnswerType::Bool(true)),
+                "n" | "no" | "false" | "0" | "f" => return Ok(AnswerType::Bool(false)),
+                _ => {
+                    println!("Enter y/n, 1/0, t/f");
+                    continue;
+                    }
+                }
            }
         };
     }
