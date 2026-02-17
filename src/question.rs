@@ -3,7 +3,6 @@ use std::io::{self, Write};
 pub struct Question{
     question: String, 
     question_type: QuestionType,
-    answer: AnswerType, 
 }
 //Enum to identify the expected answer type from a question. 
 pub enum QuestionType{
@@ -23,9 +22,9 @@ pub enum AnswerType{
     Text(String),
 }
 
-pub fn ask_question(question: &str, question_type: QuestionType) -> Result<AnswerType, String>{
+pub fn ask_question(question: &Question) -> Result<AnswerType, String>{
     loop { 
-        println!("{question}");
+        println!("{}",question.question);
         match io::stdout().flush(){
                 Ok(e) => { e },
                 Err(_e) => { println!("Error Flushing"); }
@@ -46,7 +45,7 @@ pub fn ask_question(question: &str, question_type: QuestionType) -> Result<Answe
         
         // Now we need to make sure input matches the type
         
-        match question_type {
+        match question.question_type {
            QuestionType::Int => {
                match input.parse::<i32>(){ // We want to specify i32
                     Ok(num) => return Ok(AnswerType::Int(num)),
