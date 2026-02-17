@@ -1,6 +1,10 @@
 use std::io::{self, Write}; 
 
-
+pub struct Question{
+    question: String, 
+    question_type: QuestionType,
+    answer: AnswerType, 
+}
 //Enum to identify the expected answer type from a question. 
 pub enum QuestionType{
     Bool,
@@ -82,3 +86,5 @@ pub fn ask_question(question: &str, question_type: QuestionType) -> Result<Answe
         };
     }
 }
+
+
