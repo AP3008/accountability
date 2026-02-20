@@ -1,4 +1,5 @@
-use serde; 
+use serde;
+use std::env::home_dir; 
 use std::fs::{self, create_dir, File};
 use std::path::{Path, PathBuf}; 
 use chrono;
@@ -11,8 +12,19 @@ fn create_new_entry() -> (){
          
 }
 
-fn create_all_necessary_files(path: &Path) -> (){
-    // Given a path we want to create all of the necessary files for  
+pub fn create_all_necessary_files() -> (){
+    // We want to create all of this inside of .accountability in the users home dir
+    let path: PathBuf = create_dotfile(); 
+    
+    // Create a data folder
+    let data_path: PathBuf = check_data_exists(&path);
+    println!("~/.accountability/data : has been created");
+    
+    create_accountability_csv(&data_path);
+    println!("~/.accountability/data/accountability_logs.csv : has been created");
+
+    create_questions_json(&data_path);
+    println!("~/.accountability/data/questions.json : has been created");
 }
 
 fn check_data_exists(path: &Path) -> PathBuf{
@@ -58,6 +70,17 @@ fn create_accountability_csv(path: &Path) -> (){
 
     // Creates the csv path
     File::create_new(csv_path);
+}
+
+pub fn create_dotfile() -> PathBuf {
+    let home = home_dir().unwrap(); 
+    let mut path_str = home.to_str().unwrap().to_string();
+    path_str.push_str("/.accountability");
+    let acc_path = Path::new(path_str.as_str());
+    if !(acc_path.exists() || acc_path.is_dir()){
+        create_dir(acc_path); 
+    }
+    return acc_path.to_path_buf(); 
 }
 
 fn store_questions(path: &Path, questions_list:Vec<Question>) -> (){

@@ -6,6 +6,6 @@ use crate::question::{AnswerType, QuestionType, ask_question};
 
 fn main() {
     let path: &Path = Path::new("/Users/adamporbanderwalla/Desktop/accountability");
-    crate::files::create_accountability_csv(path);
+    crate::files::create_all_necessary_files();
 }
 
