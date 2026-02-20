@@ -6,7 +6,9 @@ use chrono;
 use std::io;
 use crate::question::Question; 
 use std::ffi::OsStr;
-//Ex. path: &Path = Path&::new("/Users/adamporbanderwalla/Desktop")
+
+
+// HANDLE ERRORS FOR WHEN FILE DOES EXIST.
 
 fn create_new_entry() -> (){
          
@@ -60,7 +62,6 @@ fn create_questions_json(path: &Path) -> (){
 }
 
 fn create_accountability_csv(path: &Path) -> (){
-    check_data_exists(path);
     let mut csv_path = path.to_str().unwrap().to_string();
     csv_path.push_str("/accountability_logs.csv");
     let csv_path = Path::new(csv_path.as_str()); 

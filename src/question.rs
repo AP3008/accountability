@@ -1,10 +1,14 @@
 use std::io::{self, Write}; 
+use serde::{Serialize, Deserialize}; 
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Question{
     question: String, 
     question_type: QuestionType,
 }
+
 //Enum to identify the expected answer type from a question. 
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum QuestionType{
     Bool,
     Int,
