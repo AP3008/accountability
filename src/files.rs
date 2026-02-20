@@ -1,3 +1,4 @@
+use serde; 
 use std::fs::{self, create_dir, File};
 use std::path::{Path}; 
 use chrono;
@@ -10,7 +11,25 @@ fn create_new_entry() -> (){
     
 }
 
-pub fn create_accountability_csv(path: &Path) -> (){
+fn create_all_necessary_files() -> (){
+    
+}
+
+fn create_questions_json(path: &Path) -> (){
+    if path.file_name() == Some(OsStr::new("questions.json")) && path.exists(){
+        return; 
+    }
+    else if path.file_name() == Some(OsStr::new("questions.json")){
+        File::create_new(path); 
+    }
+    else {
+        let mut json_path = path.to_str().unwrap().to_string(); 
+        json_path.push_str("/questions.json");
+        File::create_new(Path::new(json_path.as_str())); 
+    }
+}
+
+fn create_accountability_csv(path: &Path) -> (){
     check_accountability_exists(path);
     let mut csv_path = path.to_str().unwrap().to_string();
     csv_path.push_str("/accountability_logs.csv");
@@ -23,13 +42,16 @@ pub fn create_accountability_csv(path: &Path) -> (){
     File::create_new(csv_path);
 }
 
+fn store_questions(path: &Path, questions_list:Vec<Question>) -> (){
+    
+}
+
 fn write_questions() -> (){
     
 }
 
 fn check_accountability_exists(path: &Path) -> (){
     if path.is_dir() && (path.file_name() == Some(OsStr::new("accountability"))){
-
         return; 
     }
     else if path.file_name() != Some(OsStr::new("accountability")){
@@ -43,6 +65,3 @@ fn check_accountability_exists(path: &Path) -> (){
     }
 }
 
-fn store_questions(questions_list:Vec<Question>) -> (){
-
-}
