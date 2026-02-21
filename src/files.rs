@@ -4,9 +4,8 @@ use std::env::home_dir;
 use std::ffi::OsStr;
 use std::fs::{self, File, OpenOptions, create_dir};
 use std::path::{Path, PathBuf};
-use std::io; 
+use std::io::{self, Write}; 
 
-// HANDLE ERRORS FOR WHEN FILE DOES EXIST.
 
 fn create_new_entry(path: &Path, daily_entry:DailyEntry) -> () {
     let mut file = OpenOptions::new()
@@ -123,4 +122,29 @@ fn write_questions(path: &Path, question: Question) -> () {
     let mut questions = load_questions(path);
     questions.push(question);
     store_questions(path, &questions);
+}
+
+pub fn list_questions(path: &Path) -> (){
+    let questions = load_questions(path);
+    for (index, value) in questions.iter().enumerate(){
+        println!("Question {index}: {}", value.question);
+    }
+}
+
+pub fn delete_question(path: &Path){
+    let mut questions_list = load_questions(path);
+    loop{
+        io::stdout().flush().unwrap();
+        let mut input = String::new(); 
+        println!("Choose a question to remove (or q): ");
+        match io::stdin().read_line(&mut input){
+            Ok(i) => i,
+            Err(_e) => { return; } 
+        };
+        let input: i32 = input.trim().parse().expect("Parsing failed.");
+        if ((input as usize) > questions_list.len()) || (input < 0){ continue }
+        questions_list.remove(input as usize);
+        break; 
+    }
+    store_questions(path, &questions_list);
 }

@@ -7,9 +7,9 @@ use crate::question;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Question{
-    question: String, 
-    question_type: QuestionType,
-    title: String,
+    pub question: String, 
+    pub question_type: QuestionType,
+    pub title: String,
 }
 
 //Enum to identify the expected answer type from a question. 
@@ -25,9 +25,9 @@ pub enum QuestionType{
 //A struct that we can use for daily entries
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DailyEntry{
-    date: String, 
-    question: String, 
-    answer: String
+    pub date: String, 
+    pub question: String, 
+    pub answer: String
 }
 
 //Enum to identify the type the answer should be
