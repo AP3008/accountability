@@ -1,12 +1,10 @@
 use crate::question::{AnswerType, Question, DailyEntry};
-use chrono;
-use serde;
 use serde_json;
 use std::env::home_dir;
 use std::ffi::OsStr;
 use std::fs::{self, File, OpenOptions, create_dir};
-use std::io;
 use std::path::{Path, PathBuf};
+use std::io; 
 
 // HANDLE ERRORS FOR WHEN FILE DOES EXIST.
 
@@ -16,7 +14,15 @@ fn create_new_entry(path: &Path, daily_entry:DailyEntry) -> () {
         .append(true)
         .open(path)
         .unwrap();
-    let mut csv_writer = csv::Writer::from_writer(file); 
+
+    let is_empty = match fs::metadata(path){
+        Ok(metadata) => { metadata.len() == 0 },
+        Err(_) => true
+    };
+
+    let mut csv_writer = csv::WriterBuilder::new()
+        .has_headers(is_empty)
+        .from_writer(file); 
     csv_writer.serialize(&daily_entry).unwrap();
     csv_writer.flush().unwrap(); 
 }
@@ -102,6 +108,15 @@ fn store_questions(path: &Path, questions_list: &[Question]) -> () {
     // file path exists.
     let json = serde_json::to_string_pretty(path).unwrap();
     fs::write(path, json);
+}
+
+fn load_questions(path: &Path) -> Vec<Question>{
+    //We are given the path to data and now have the json 
+    // We just need to extract every question and append it to a vector
+    let data = fs::read_to_string(path).unwrap();
+    let questions: Vec<Question> = serde_json::from_str(&data)
+        .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e)).unwrap(); 
+    return questions; 
 }
 
 fn write_questions() -> () {}
