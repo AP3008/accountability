@@ -18,7 +18,7 @@ fn create_new_entry(path: &Path, answer: AnswerType) -> () {
         .open(path)
         .unwrap();
     let mut csv_writer = csv::Writer::from_writer(file); 
-    
+    csv_writer.serialize(answer).unwrap();
 }
 
 pub fn create_all_necessary_files() -> () {
