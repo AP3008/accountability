@@ -22,6 +22,7 @@ pub enum QuestionType{
 }
 
 //Enum to identify the type the answer should be
+#[derive(Debug, Clone, Serialize)]
 pub enum AnswerType{
     Bool(bool),
     Int(i32),
