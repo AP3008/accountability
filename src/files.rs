@@ -1,4 +1,4 @@
-use crate::question::{AnswerType, Question, DailyEntry};
+use crate::question::{self, AnswerType, DailyEntry, Question};
 use serde_json;
 use std::env::home_dir;
 use std::ffi::OsStr;
@@ -106,7 +106,7 @@ fn store_questions(path: &Path, questions_list: &[Question]) -> () {
     // We serialize the vector of questions so we can write it to our file
     // Because I am the only one calling the function in another function we don't need to check if
     // file path exists.
-    let json = serde_json::to_string_pretty(path).unwrap();
+    let json = serde_json::to_string_pretty(questions_list).unwrap();
     fs::write(path, json);
 }
 
@@ -119,4 +119,8 @@ fn load_questions(path: &Path) -> Vec<Question>{
     return questions; 
 }
 
-fn write_questions() -> () {}
+fn write_questions(path: &Path, question: Question) -> () {
+    let mut questions = load_questions(path);
+    questions.push(question);
+    store_questions(path, &questions);
+}
