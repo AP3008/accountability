@@ -26,7 +26,7 @@ fn create_new_entry(path: &Path, daily_entry:DailyEntry) -> () {
     csv_writer.flush().unwrap(); 
 }
 
-pub fn create_all_necessary_files() -> () {
+pub fn create_all_necessary_files() -> PathBuf{
     // We want to create all of this inside of .accountability in the users home dir
     let path: PathBuf = create_dotfile();
 
@@ -39,6 +39,9 @@ pub fn create_all_necessary_files() -> () {
 
     create_questions_json(&data_path);
     println!("~/.accountability/data/questions.json : has been created");
+
+    // ~/.accountability
+    return data_path; 
 }
 
 fn check_data_exists(path: &Path) -> PathBuf {
@@ -109,7 +112,7 @@ fn store_questions(path: &Path, questions_list: &[Question]) -> () {
     fs::write(path, json);
 }
 
-fn load_questions(path: &Path) -> Vec<Question>{
+pub fn load_questions(path: &Path) -> Vec<Question>{
     //We are given the path to data and now have the json 
     // We just need to extract every question and append it to a vector
     let data = fs::read_to_string(path).unwrap();
@@ -118,7 +121,7 @@ fn load_questions(path: &Path) -> Vec<Question>{
     return questions; 
 }
 
-fn write_questions(path: &Path, question: Question) -> () {
+pub fn write_questions(path: &Path, question: Question) -> () {
     let mut questions = load_questions(path);
     questions.push(question);
     store_questions(path, &questions);
