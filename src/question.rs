@@ -1,4 +1,5 @@
 use std::{error::Error, io::{self, Write}}; 
+use chrono::Local; 
 use serde::{Serialize, Deserialize};
 
 use crate::question;
@@ -19,6 +20,14 @@ pub enum QuestionType{
     Float,
     PosNumber,
     Text,
+}
+
+//A struct that we can use for daily entries
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DailyEntry{
+    date: String, 
+    question: String, 
+    answer: String
 }
 
 //Enum to identify the type the answer should be
@@ -165,4 +174,14 @@ pub fn create_new_question() -> Result<Question, std::io::Error>{
         };
         return Ok(question)
     }
+}
+
+pub fn answer_to_entry(question: &str, answer: &str) -> DailyEntry{
+     let today = Local::now().format("%d/%m/%Y").to_string(); 
+     let daily_entry: DailyEntry = DailyEntry{
+        date: today,
+        question: question.to_string(),
+        answer: answer.to_string()
+     };
+     return daily_entry;
 }

@@ -1,4 +1,4 @@
-use crate::question::{AnswerType, Question};
+use crate::question::{AnswerType, Question, DailyEntry};
 use chrono;
 use serde;
 use serde_json;
@@ -10,15 +10,15 @@ use std::path::{Path, PathBuf};
 
 // HANDLE ERRORS FOR WHEN FILE DOES EXIST.
 
-fn create_new_entry(path: &Path, answer: AnswerType) -> () {
+fn create_new_entry(path: &Path, daily_entry:DailyEntry) -> () {
     let mut file = OpenOptions::new()
         .create(true)
-        .write(true)
         .append(true)
         .open(path)
         .unwrap();
     let mut csv_writer = csv::Writer::from_writer(file); 
-    csv_writer.serialize(answer).unwrap();
+    csv_writer.serialize(&daily_entry).unwrap();
+    csv_writer.flush().unwrap(); 
 }
 
 pub fn create_all_necessary_files() -> () {
