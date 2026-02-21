@@ -1,4 +1,5 @@
 use serde;
+use serde_json;
 use std::env::home_dir; 
 use std::fs::{self, create_dir, File};
 use std::path::{Path, PathBuf}; 
@@ -84,12 +85,16 @@ pub fn create_dotfile() -> PathBuf {
     return acc_path.to_path_buf(); 
 }
 
-fn store_questions(path: &Path, questions_list:Vec<Question>) -> (){
-    
+fn store_questions(path: &Path, questions_list: &[Question]) -> (){
+    // We serialize the vector of questions so we can write it to our file
+    // Because I am the only one calling the function in another function we don't need to check if
+    // file path exists. 
+    let json = serde_json::to_string_pretty(path).unwrap();
+    fs::write(path, json);  
 }
 
 fn write_questions() -> (){
-    
+     
 }
 
 
