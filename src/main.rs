@@ -1,7 +1,7 @@
 mod question;
 mod files;
 use std::{io::{Write, stdout}, path::Path}; 
-use crate::question::{AnswerType, QuestionType, ask_question};
+use crate::{files::delete_question, question::{AnswerType, QuestionType, ask_question}};
 use std::path::PathBuf;
 
 //All the paths that I am going to use
@@ -38,8 +38,36 @@ fn main() {
         let input: i32 = input.trim().parse().expect("Parsing Failed.\n");
         match input{
             1 => {
-                let question_list = crate::files::load_questions(&path);
-            }
+                let question_list = crate::files::load_questions(&path_json);
+                for value in question_list.iter(){
+                    let q = &value.question; 
+                    let res = match ask_question(value){
+                        Ok(ans) => { ans },
+                        Err(e) => { break; },
+                    };
+                    let a = match res {
+                        AnswerType::Int(i) => { i.to_string() },
+                        AnswerType::Bool(b) => { b.to_string() },
+                        AnswerType::Text(s) => { s.to_string() },
+                        AnswerType::Float(f) => { f.to_string() },
+                        AnswerType::PosNumber(u) => { u.to_string() },
+                        _ => { continue; }
+                    }; 
+                    let daily_entry = crate::question::answer_to_entry(q.as_str(), a.as_str()); 
+                    crate::files::create_new_entry(path_csv, daily_entry);
+                }
+            },
+            2 => {
+                let new_question = match crate::question::create_new_question(){
+                    Ok(q) => { q },
+                    Err(e) => { 
+                        println!("Error: {e}");
+                        continue; 
+                    }
+                };
+                crate::files::write_questions(&path_json, new_question);
+            },
+            3 => { delete_question(&path); } 
             _ => { continue; }
         }
     }

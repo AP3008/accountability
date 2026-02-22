@@ -3,30 +3,29 @@ use serde_json;
 use std::env::home_dir;
 use std::ffi::OsStr;
 use std::fs::{self, File, OpenOptions, create_dir};
+use std::io::{self, Write};
 use std::path::{Path, PathBuf};
-use std::io::{self, Write}; 
 
-
-fn create_new_entry(path: &Path, daily_entry:DailyEntry) -> () {
+pub fn create_new_entry(path: &Path, daily_entry: DailyEntry) -> () {
     let mut file = OpenOptions::new()
         .create(true)
         .append(true)
         .open(path)
         .unwrap();
 
-    let is_empty = match fs::metadata(path){
-        Ok(metadata) => { metadata.len() == 0 },
-        Err(_) => true
+    let is_empty = match fs::metadata(path) {
+        Ok(metadata) => metadata.len() == 0,
+        Err(_) => true,
     };
 
     let mut csv_writer = csv::WriterBuilder::new()
         .has_headers(is_empty)
-        .from_writer(file); 
+        .from_writer(file);
     csv_writer.serialize(&daily_entry).unwrap();
-    csv_writer.flush().unwrap(); 
+    csv_writer.flush().unwrap();
 }
 
-pub fn create_all_necessary_files() -> PathBuf{
+pub fn create_all_necessary_files() -> PathBuf {
     // We want to create all of this inside of .accountability in the users home dir
     let path: PathBuf = create_dotfile();
 
@@ -41,7 +40,7 @@ pub fn create_all_necessary_files() -> PathBuf{
     println!("~/.accountability/data/questions.json : has been created");
 
     // ~/.accountability
-    return data_path; 
+    return data_path;
 }
 
 fn check_data_exists(path: &Path) -> PathBuf {
@@ -51,7 +50,7 @@ fn check_data_exists(path: &Path) -> PathBuf {
         let mut acc_path = path.to_str().unwrap().to_string();
         acc_path.push_str("/data");
         let acc_path = Path::new(acc_path.as_str());
-        if !(acc_path.exists()){
+        if !(acc_path.exists()) {
             create_dir(acc_path).unwrap();
         }
         return acc_path.to_path_buf();
@@ -67,13 +66,13 @@ fn create_questions_json(path: &Path) -> () {
     }
     //redundant check, I won't be passing in the full path; consider removing
     else if path.file_name() == Some(OsStr::new("questions.json")) {
-        if !path.exists(){
+        if !path.exists() {
             File::create_new(path);
         }
     } else {
         let mut json_path = path.to_str().unwrap().to_string();
         json_path.push_str("/questions.json");
-        if !path.exists(){
+        if !path.exists() {
             File::create_new(Path::new(json_path.as_str()));
         }
     }
@@ -112,13 +111,14 @@ fn store_questions(path: &Path, questions_list: &[Question]) -> () {
     fs::write(path, json);
 }
 
-pub fn load_questions(path: &Path) -> Vec<Question>{
-    //We are given the path to data and now have the json 
+pub fn load_questions(path: &Path) -> Vec<Question> {
+    //We are given the path to data and now have the json
     // We just need to extract every question and append it to a vector
     let data = fs::read_to_string(path).unwrap();
     let questions: Vec<Question> = serde_json::from_str(&data)
-        .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e)).unwrap(); 
-    return questions; 
+        .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))
+        .unwrap();
+    return questions;
 }
 
 pub fn write_questions(path: &Path, question: Question) -> () {
@@ -127,27 +127,31 @@ pub fn write_questions(path: &Path, question: Question) -> () {
     store_questions(path, &questions);
 }
 
-pub fn list_questions(path: &Path) -> (){
+pub fn list_questions(path: &Path) -> () {
     let questions = load_questions(path);
-    for (index, value) in questions.iter().enumerate(){
+    for (index, value) in questions.iter().enumerate() {
         println!("Question {index}: {}", value.question);
     }
 }
 
-pub fn delete_question(path: &Path){
+pub fn delete_question(path: &Path) {
     let mut questions_list = load_questions(path);
-    loop{
+    loop {
         io::stdout().flush().unwrap();
-        let mut input = String::new(); 
+        let mut input = String::new();
         println!("Choose a question to remove (or q): ");
-        match io::stdin().read_line(&mut input){
+        match io::stdin().read_line(&mut input) {
             Ok(i) => i,
-            Err(_e) => { return; } 
+            Err(_e) => {
+                return;
+            }
         };
         let input: i32 = input.trim().parse().expect("Parsing failed.");
-        if ((input as usize) > questions_list.len()) || (input < 0){ continue }
+        if ((input as usize) > questions_list.len()) || (input < 0) {
+            continue;
+        }
         questions_list.remove(input as usize);
-        break; 
+        break;
     }
     store_questions(path, &questions_list);
 }

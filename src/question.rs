@@ -2,14 +2,12 @@ use std::{error::Error, io::{self, Write}};
 use chrono::Local; 
 use serde::{Serialize, Deserialize};
 
-use crate::question;
 
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Question{
     pub question: String, 
     pub question_type: QuestionType,
-    pub title: String,
 }
 
 //Enum to identify the expected answer type from a question. 
@@ -160,17 +158,16 @@ pub fn create_new_question() -> Result<Question, std::io::Error>{
             }
         } 
         io::stdout().flush().unwrap(); 
-        let mut question_title = String::new(); 
-        println!("What do you want the title of this question to be: "); 
-        match io::stdin().read_line(&mut question_title){
-            Ok(i) => { i },
-            Err(e) => { return Err(e)}
-        };
-        let question_title = question_title.trim(); 
+        //let mut question_title = String::new(); 
+//        println!("What do you want the title of this question to be: "); 
+//        match io::stdin().read_line(&mut question_title){
+//            Ok(i) => { i },
+//            Err(e) => { return Err(e)}
+//        };
+//        let question_title = question_title.trim(); 
         let question: Question = Question {
             question : question_q.to_string(),
             question_type : question_t,
-            title : question_title.to_string()
         };
         return Ok(question)
     }
