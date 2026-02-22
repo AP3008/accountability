@@ -31,13 +31,10 @@ pub fn create_all_necessary_files() -> PathBuf {
 
     // Create a data folder
     let data_path: PathBuf = check_data_exists(&path);
-    println!("~/.accountability/data : has been created");
 
     create_accountability_csv(&data_path);
-    println!("~/.accountability/data/accountability_logs.csv : has been created");
 
     create_questions_json(&data_path);
-    println!("~/.accountability/data/questions.json : has been created");
 
     // ~/.accountability
     return data_path;
@@ -140,7 +137,8 @@ pub fn delete_question(path: &Path) -> () {
         if trimmed.eq_ignore_ascii_case("q") {
             return;
         }
-        let input: i32 = trimmed.parse().expect("Parsing failed."); if ((input as usize) > questions_list.len()) || (input < 0) {
+        let input: i32 = trimmed.parse().expect("Parsing failed.");
+        if ((input as usize) > questions_list.len()) || (input < 0) {
             continue;
         }
         questions_list.remove(input as usize);
@@ -149,23 +147,25 @@ pub fn delete_question(path: &Path) -> () {
     store_questions(path, &questions_list);
 }
 
-pub fn list_answers(path: &Path) -> (){
-    let mut rdr = csv::Reader::from_path(path).unwrap();    
-    for res in rdr.records(){
-        let res = res.unwrap().clone(); 
+pub fn list_answers(path: &Path) -> () {
+    let mut rdr = csv::Reader::from_path(path).unwrap();
+    for res in rdr.records() {
+        let res = res.unwrap().clone();
         println!("----------------");
         println!("Date: {}", res[0].to_string());
         println!("Question: {}", res[1].to_string());
-        println!("Answer: {}", res[2].to_string()); 
+        println!("Answer: {}", res[2].to_string());
         println!("----------------");
         print!("\n\nNext? (n): ");
-        std::io::stdout().flush().unwrap(); 
-        let mut input = String::new(); 
-        std::io::stdin().read_line(&mut input); 
-        let input = input.trim(); 
-        match input.to_lowercase().as_str(){
-            "n" | "next" | "nex" | "ne" => { continue; } 
-            _ => { break }
+        std::io::stdout().flush().unwrap();
+        let mut input = String::new();
+        std::io::stdin().read_line(&mut input);
+        let input = input.trim();
+        match input.to_lowercase().as_str() {
+            "n" | "next" | "nex" | "ne" => {
+                continue;
+            }
+            _ => break,
         }
     }
 }
