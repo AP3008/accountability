@@ -156,7 +156,7 @@ pub fn list_answers(path: &Path) -> () {
         println!("Question: {}", res[1].to_string());
         println!("Answer: {}", res[2].to_string());
         println!("----------------");
-        print!("\n\nNext? (n): ");
+        print!("Next? (n): ");
         std::io::stdout().flush().unwrap();
         let mut input = String::new();
         std::io::stdin().read_line(&mut input);

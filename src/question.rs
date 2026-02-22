@@ -41,7 +41,7 @@ pub enum AnswerType {
 
 pub fn ask_question(question: &Question) -> Result<AnswerType, String> {
     loop {
-        println!("{}", question.question);
+        print!("{}", question.question);
         match io::stdout().flush() {
             Ok(e) => e,
             Err(_e) => {
