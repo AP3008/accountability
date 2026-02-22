@@ -60,21 +60,13 @@ fn check_data_exists(path: &Path) -> PathBuf {
     }
 }
 
-fn create_questions_json(path: &Path) -> () {
-    if path.file_name() == Some(OsStr::new("questions.json")) && path.exists() {
-        return;
-    }
-    //redundant check, I won't be passing in the full path; consider removing
-    else if path.file_name() == Some(OsStr::new("questions.json")) {
-        if !path.exists() {
-            File::create_new(path);
-        }
-    } else {
-        let mut json_path = path.to_str().unwrap().to_string();
-        json_path.push_str("/questions.json");
-        if !path.exists() {
-            File::create_new(Path::new(json_path.as_str()));
-        }
+fn create_questions_json(path: &Path) {
+    let mut json_path = path.to_str().unwrap().to_string();
+    json_path.push_str("/questions.json");
+    let json_path = Path::new(&json_path);
+
+    if !json_path.exists() {
+        fs::write(json_path, "[]").unwrap();
     }
 }
 
@@ -112,15 +104,13 @@ fn store_questions(path: &Path, questions_list: &[Question]) -> () {
 }
 
 pub fn load_questions(path: &Path) -> Vec<Question> {
-    //We are given the path to data and now have the json
-    // We just need to extract every question and append it to a vector
-    let data = fs::read_to_string(path).unwrap();
-    let questions: Vec<Question> = serde_json::from_str(&data)
-        .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))
-        .unwrap();
-    return questions;
+    let data = fs::read_to_string(path).unwrap_or_default();
+    let trimmed = data.trim();
+    if trimmed.is_empty() {
+        return Vec::new();
+    }
+    serde_json::from_str(trimmed).unwrap()
 }
-
 pub fn write_questions(path: &Path, question: Question) -> () {
     let mut questions = load_questions(path);
     questions.push(question);
@@ -134,7 +124,7 @@ pub fn list_questions(path: &Path) -> () {
     }
 }
 
-pub fn delete_question(path: &Path) {
+pub fn delete_question(path: &Path) -> () {
     let mut questions_list = load_questions(path);
     loop {
         io::stdout().flush().unwrap();
@@ -146,12 +136,36 @@ pub fn delete_question(path: &Path) {
                 return;
             }
         };
-        let input: i32 = input.trim().parse().expect("Parsing failed.");
-        if ((input as usize) > questions_list.len()) || (input < 0) {
+        let trimmed = input.trim();
+        if trimmed.eq_ignore_ascii_case("q") {
+            return;
+        }
+        let input: i32 = trimmed.parse().expect("Parsing failed."); if ((input as usize) > questions_list.len()) || (input < 0) {
             continue;
         }
         questions_list.remove(input as usize);
         break;
     }
     store_questions(path, &questions_list);
+}
+
+pub fn list_answers(path: &Path) -> (){
+    let mut rdr = csv::Reader::from_path(path).unwrap();    
+    for res in rdr.records(){
+        let res = res.unwrap().clone(); 
+        println!("----------------");
+        println!("Date: {}", res[0].to_string());
+        println!("Question: {}", res[1].to_string());
+        println!("Answer: {}", res[2].to_string()); 
+        println!("----------------");
+        print!("\n\nNext? (n): ");
+        std::io::stdout().flush().unwrap(); 
+        let mut input = String::new(); 
+        std::io::stdin().read_line(&mut input); 
+        let input = input.trim(); 
+        match input.to_lowercase().as_str(){
+            "n" | "next" | "nex" | "ne" => { continue; } 
+            _ => { break }
+        }
+    }
 }

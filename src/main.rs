@@ -4,11 +4,6 @@ use std::{io::{Write, stdout}, path::Path};
 use crate::{files::delete_question, question::{AnswerType, QuestionType, ask_question}};
 use std::path::PathBuf;
 
-//All the paths that I am going to use
-// Users/adamporbanderwalla/.accountability
-// Users/adamporbanderwalla/.accountability/data
-// Users/adamporbanderwalla/.accountability/data/accountability_logs.csv
-// Users/adamporbanderwalla/.accountability/data/questions.json
 fn main() {
     //~/.accountability/data path
     let path: PathBuf = crate::files::create_all_necessary_files();
@@ -27,15 +22,22 @@ fn main() {
     println!("\t4. List Answers");
     
     loop {
-        println!("Pick a number (or q): "); 
+        print!("Pick a number (or q): "); 
         std::io::stdout().flush().unwrap();
         let mut input = String::new();
         match std::io::stdin().read_line(&mut input){
             Ok(i) => i,
             Err(_e) => { return; }
         };
-        if input.trim() == "q" { break; }
-        let input: i32 = input.trim().parse().expect("Parsing Failed.\n");
+        let trimmed = input.trim();
+        if trimmed.eq_ignore_ascii_case("q") { break; }
+
+        let input: i32 = match trimmed.parse() {
+            Ok(n) => n,
+            Err(_) => {
+                continue;
+            }
+        };
         match input{
             1 => {
                 let question_list = crate::files::load_questions(&path_json);
@@ -43,7 +45,7 @@ fn main() {
                     let q = &value.question; 
                     let res = match ask_question(value){
                         Ok(ans) => { ans },
-                        Err(e) => { break; },
+                        Err(e) => { continue; },
                     };
                     let a = match res {
                         AnswerType::Int(i) => { i.to_string() },
@@ -51,7 +53,6 @@ fn main() {
                         AnswerType::Text(s) => { s.to_string() },
                         AnswerType::Float(f) => { f.to_string() },
                         AnswerType::PosNumber(u) => { u.to_string() },
-                        _ => { continue; }
                     }; 
                     let daily_entry = crate::question::answer_to_entry(q.as_str(), a.as_str()); 
                     crate::files::create_new_entry(path_csv, daily_entry);
@@ -68,6 +69,7 @@ fn main() {
                 crate::files::write_questions(&path_json, new_question);
             },
             3 => { delete_question(&path); } 
+            4 => {  }
             _ => { continue; }
         }
     }
